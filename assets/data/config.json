@@ -1,0 +1,55 @@
+{
+	"boyAnswerNumber": 1,
+
+	"identicalTwinAnswerNumber" : 1,
+	"nonIdenticalTwinsAnswerNumber" : 2,
+	"brothersAnswerNumber" : 3,
+
+	"identicalBoysStatsText": "םינב םיהז םימואת",
+	"identicalGirlsStatsText": "תונב םיהז םימואת",
+	"nonIdenticalBoysStatsText": "םינב םיהז אל םימואת",
+	"nonIdenticalGirlsStatsText": "תונב םיהז אל םימואת",
+	"boyGirlStatsText": "תבו ןב םיהז אל םימואת",
+	"brothersText": "םימואת םניאש םיחא",
+	"notBrothersText": "םיחא אל",
+
+	"statsGroupTextX" : 700,
+	"statsValueTextX" : 1200,
+	"statsFirstTextY" : 100,
+	"statsYDiff" : 120,
+
+	"percentageSuffixText": "החלצה",
+
+	"chooseWaitText": "...םואתה תריחבל ןתמה",
+	"guessWaitText": "...םואתה שוחינל ןתמה",
+	"identityWaitText": "...םואתה תבושתל הכחמ",
+
+	"identityQuestions": [
+		{
+			"questionText": "?תב וא ןב התא םאה",
+			"answerTexts": ["ןב", "תב"]
+		},
+		{
+			"questionText": "?םתא םימואת וליא",
+			"answerTexts": ["םיהז םימואת", "םיהז אל םימואת", "םימואת םניאש םיחא", "םיחא אל"]
+		}
+	],
+
+	"guessQuestions": [
+		{
+			"chooseText": "בוהא עבצ רחב",
+			"guessText": "...םואתה רחבש עבצה תא שחנ",
+			"answerImages": ["color1.png", "color2.png", "color3.png", "color4.png"]
+		},
+		{
+			"chooseText": "בוהא עבצ רחב",
+			"guessText": "...םואתה רחבש עבצה תא שחנ",
+			"answerImages": ["color1.png", "color2.png", "color3.png", "color4.png"]
+		},
+		{
+			"chooseText": "בוהא עבצ רחב",
+			"guessText": "...םואתה רחבש עבצה תא שחנ",
+			"answerImages": ["color1.png", "color2.png", "color3.png", "color4.png"]
+		}
+	]
+}
