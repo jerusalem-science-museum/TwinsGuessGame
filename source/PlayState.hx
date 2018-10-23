@@ -13,6 +13,8 @@ import flixel.text.FlxText;
 import flixel.input.keyboard.FlxKey;
 import flixel.group.FlxSpriteGroup;
 
+import flixel.util.FlxTimer;
+
 import openfl.system.System;
 
 // IMPORTANT!
@@ -78,8 +80,8 @@ class PlayState extends FlxState
         add(secondTwinSpriteGroup);
         add(statsSpriteGroup);
 
-        var firstTwinScreen : TwinScreen = new TwinScreen(firstTwinSpriteGroup, 0, [FlxKey.ZERO, FlxKey.ONE, FlxKey.TWO, FlxKey.THREE], this);
-        var secondTwinScreen : TwinScreen = new TwinScreen(secondTwinSpriteGroup, 1, [FlxKey.SIX, FlxKey.SEVEN, FlxKey.EIGHT, FlxKey.NINE], this);
+        var firstTwinScreen : TwinScreen = new TwinScreen(firstTwinSpriteGroup, this.config, 0, [FlxKey.ZERO, FlxKey.ONE, FlxKey.TWO, FlxKey.THREE], this);
+        var secondTwinScreen : TwinScreen = new TwinScreen(secondTwinSpriteGroup, this.config, 1, [FlxKey.SIX, FlxKey.SEVEN, FlxKey.EIGHT, FlxKey.NINE], this);
         twinScreens = new Array<TwinScreen>();
         twinScreens.push(firstTwinScreen);
         twinScreens.push(secondTwinScreen);
@@ -112,10 +114,12 @@ class PlayState extends FlxState
         currAnswers[index] = answer;
 
         if (answersMade == expectedAnswers) {
-            nextState();
+            new FlxTimer().start(3, function(timer) { nextState(); }, 1);
         } else {
             showWaitScreen(index);
         }
+
+        SoundUtils.playSound(SoundUtils.ITEM_SELECTED_SOUND);
     }
 
     public function nextState() {
@@ -148,15 +152,12 @@ class PlayState extends FlxState
     }
 
     private function evaluateHit() {
-        var isCorrect : Bool = false;
         if (this.currAnswers[this.nextGuesserIndex] == this.currAnswers[this.nextChooserIndex]) {
             this.hits++;
-            isCorrect = true;
         }
 
-        trace("EVALUATING HIT: " + isCorrect);
-        this.twinScreens[this.nextGuesserIndex].presentTwinAnswer(this.currAnswers[this.nextChooserIndex], isCorrect);
-        this.twinScreens[this.nextChooserIndex].presentTwinAnswer(this.currAnswers[this.nextGuesserIndex], isCorrect);
+        this.twinScreens[this.nextGuesserIndex].presentTwinAnswer(this.currAnswers[this.nextChooserIndex], this.currAnswers[this.nextGuesserIndex]);
+        this.twinScreens[this.nextChooserIndex].presentTwinAnswer(this.currAnswers[this.nextGuesserIndex], this.currAnswers[this.nextChooserIndex]);
     }
 
     private function startGame() {
@@ -167,6 +168,7 @@ class PlayState extends FlxState
         this.currIdentityQuestion = 0;
         state = BOY_GIRL_QUESTION;
         showIdentityQuestion();
+        SoundUtils.playMusic(SoundUtils.CHOOSE_MUSIC);
     }
 
     private function showNextGuessQuestion() {

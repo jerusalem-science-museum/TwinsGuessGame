@@ -35,6 +35,7 @@
 	<assets path="assets/images"/>
 	<assets path="assets/data"/>
 	<assets path="assets/fonts"/>
+	 <assets path="assets/sounds" />
 
 	<!-- _______________________________ Libraries ______________________________ -->
 
@@ -69,7 +70,7 @@
 	<!--<haxedef name="FLX_NO_GAMEPAD" />-->
 
 	<!--Disable the Flixel core sound tray-->
-	<!--<haxedef name="FLX_NO_SOUND_TRAY" />-->
+	<haxedef name="FLX_NO_SOUND_TRAY" />
 
 	<!--Disable the Flixel sound management code-->
 	<!--<haxedef name="FLX_NO_SOUND_SYSTEM" />-->

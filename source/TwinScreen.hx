@@ -13,17 +13,6 @@ using flixel.util.FlxSpriteUtil;
 
 class TwinScreen extends Screen {
 
-	private static var RECT_HEIGHT : Int = 300;
-	private static var RECT_WIDTH : Int = 300;
-	private static var NUMBER_HEIGHT : Int = 50;
-
-	private static var ANSWERS_POSITIONS = [
-		{x: 1920 / 4, y : 1080 / 3},
-		{x: 1920 * 3 / 4, y: 1080 / 3},
-		{x: 1920 / 4, y: 1080 * 2 / 3},
-		{x: 1920 * 3 / 4, y: 1080 * 2 / 3}
-	];
-
 	private var buttonKeys : Array<FlxKey>;
 	private var game : PlayState;
 	private var inputActive : Bool;
@@ -38,36 +27,44 @@ class TwinScreen extends Screen {
 	private var waitOverlay : FlxSprite;
 	private var waitText : FlxText;
 
-	public function new(screen : FlxSpriteGroup, twinIndex : Int, buttonKeys : Array<FlxKey>, game : PlayState) {
-		super(screen);
+	private var selectedIndex : Null<Int>;
+	private var correctIndex : Null<Int>;
+	private var currAnswers : Int;
+
+	public function new(screen : FlxSpriteGroup, config : ConfigData, twinIndex : Int, buttonKeys : Array<FlxKey>, game : PlayState) {
+		super(screen, config);
 		this.buttonKeys = buttonKeys;
 		this.game = game;
 		this.twinIndex = twinIndex;
 		this.inputActive = false;
+		this.selectedIndex = null;
+		this.correctIndex = null;
 
-		this.questionText = createText(1920 / 2, 60, 60);
+		this.questionText = createText(this.config.questionPosition.x, this.config.questionPosition.y, this.config.questionFontSize, this.config.questionTextColor);
 
 		this.textAnswers = new Array<FlxText>();
 
-		this.textAnswers.push(createText(1920 / 4, 1080 / 3, 42));
-		this.textAnswers.push(createText(1920 * 3 / 4, 1080 / 3, 42));
-		this.textAnswers.push(createText(1920 / 4, 1080 * 2 / 3, 42));
-		this.textAnswers.push(createText(1920 * 3 / 4, 1080 * 2 / 3, 42));
-
+		for (i in 0...this.config.answerPositions.length) {
+			this.textAnswers.push(createText(this.config.answerPositions[i].x, this.config.answerPositions[i].y, this.config.answerFontSize, this.config.answerTextColor));
+		}
+		
 		this.imageAnswers = new Array<FlxSprite>();
 
 		this.waitOverlay = new FlxSprite();
-		this.waitOverlay.makeGraphic(1920, 1080, new FlxColor(0xAAFFFFFF));
+		this.waitOverlay.makeGraphic(this.config.screenWidth, this.config.screenHeight, new FlxColor(Std.parseInt(this.config.waitBackgroundColor)));
 
 		screen.add(this.waitOverlay);
 
-		this.waitText = createText(1920 / 2, 1080 / 2, 60);
+		this.waitText = createText(this.config.waitTextPosition.x, this.config.waitTextPosition.y, this.config.waitTextFontSize, this.config.waitTextColor);
 
 		setWaitOverlayVisibility(false);
 	}
 
 	public function presentTextQuestion(text : String, answers : Array<String>) {
-		drawBackground(answers.length);
+		this.selectedIndex = null;
+		this.correctIndex = null;
+		this.currAnswers = answers.length;
+		drawBackground();
 		setWaitOverlayVisibility(false);
 		hide(this.imageAnswers);
 
@@ -91,8 +88,8 @@ class TwinScreen extends Screen {
 		//TODO: Destroy properly
 		this.imageAnswers = [];
 		for (i in 0...images.length) {
-			images[i].x = ANSWERS_POSITIONS[i].x;
-			images[i].y = ANSWERS_POSITIONS[i].y;
+			images[i].x = this.config.answerPositions[i].x;
+			images[i].y = this.config.answerPositions[i].y;
 			this.imageAnswers.push(images[i]);
 			screen.add(images[i]);
 		}
@@ -115,11 +112,11 @@ class TwinScreen extends Screen {
 		setWaitOverlayVisibility(true);
 	}
 
-	public function presentTwinAnswer(index : Int, isCorrect : Bool) {
+	public function presentTwinAnswer(index : Int, correctIndex : Int) {
 		this.inputActive = false;
+		this.correctIndex = correctIndex;
 		setWaitOverlayVisibility(false);
-
-		// Render answer in green if correct, or red if not correct
+		drawBackground();
 	}
 
 	public function update() {
@@ -137,15 +134,38 @@ class TwinScreen extends Screen {
 		waitText.visible = visible;
 	}
 
-	private function drawBackground(questionsNum : Int) {
+	private function drawBackground() {
 		clearBackground();
-		for (i in 0...questionsNum) {
-			this.canvas.drawRect(ANSWERS_POSITIONS[i].x - RECT_WIDTH / 2, ANSWERS_POSITIONS[i].y - RECT_HEIGHT / 2, RECT_WIDTH, RECT_HEIGHT, new FlxColor(0xFF0B6623), { color : new FlxColor(0xFF41FF00), thickness : 10 }, { smoothing : true });
+		for (i in 0...this.currAnswers) {
+			var fillColor : FlxColor = (i == this.selectedIndex) ? new FlxColor(Std.parseInt(this.config.answerSelectedBackgroundColor)) : new FlxColor(Std.parseInt(this.config.answerBackgroundColor));
+
+			if (this.correctIndex != null && i == this.correctIndex) {
+				fillColor = new FlxColor(Std.parseInt(this.config.answerCorrectBackgroundColor));
+			}
+
+			if (this.correctIndex != null && i == this.selectedIndex && this.selectedIndex != this.correctIndex) {
+				fillColor = new FlxColor(Std.parseInt(this.config.answerWrongBackgroundColor));
+			}
+
+			this.canvas.drawRect(this.config.answerPositions[i].x - this.config.answerRectWidth / 2, 
+				this.config.answerPositions[i].y - this.config.answerRectHeight / 2, 
+				this.config.answerRectWidth, this.config.answerRectHeight, fillColor, 
+				{ color : new FlxColor(Std.parseInt(this.config.answerBorderColor)), thickness : this.config.answerBorderThickness }, { smoothing : true });
+			this.canvas.drawRect(this.config.answerPositions[i].x - this.config.answerRectWidth / 2, 
+				this.config.answerPositions[i].y - this.config.answerRectHeight / 2 - this.config.answerNumberHeight, 
+				this.config.answerRectWidth, this.config.answerNumberHeight, fillColor,
+				 { color : new FlxColor(Std.parseInt(this.config.answerBorderColor)), thickness : this.config.answerBorderThickness }, { smoothing : true });
+			var numberText : FlxText = createText(this.config.answerPositions[i].x, 
+				this.config.answerPositions[i].y - this.config.answerRectWidth / 2 - this.config.answerNumberHeight / 2, this.config.answerNumberFontSize, this.config.answerNumberTextColor);
+			setText(numberText, Std.string(i + 1));
 		}
 	}
 
 	private function handleSelection(index : Int) {
 		trace("SELECTED: " + index);
+		
+		this.selectedIndex = index;
+		this.drawBackground();
 		// Mark selection answer, sound, wait a bit...
 
 		this.game.onSelection(this.twinIndex, index);

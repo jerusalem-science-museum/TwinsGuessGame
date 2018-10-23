@@ -10,12 +10,14 @@ using flixel.util.FlxSpriteUtil;
 class Screen {
 	private var screen : FlxSpriteGroup;
 	private var canvas : FlxSprite;
+	private var config : ConfigData;
 
-	public function new(screen : FlxSpriteGroup) {
+	public function new(screen : FlxSpriteGroup, config : ConfigData) {
 		this.screen = screen;
+		this.config = config;
 
 		this.canvas = new FlxSprite();
-		this.canvas.makeGraphic(1920, 1080, FlxColor.TRANSPARENT, true);
+		this.canvas.makeGraphic(this.config.screenWidth, this.config.screenHeight, FlxColor.TRANSPARENT, true);
 
 		screen.add(this.canvas);
 
@@ -24,12 +26,14 @@ class Screen {
 
 	public function clearBackground() {
 		this.canvas.fill(FlxColor.TRANSPARENT);
-		this.canvas.drawRect(0, 0, 1920, 1080, new FlxColor(0xFF0B6623), { color : new FlxColor(0xFF41FF00), thickness : 10 }, { smoothing : true });
+		this.canvas.drawRect(0, 0, this.config.screenWidth, this.config.screenHeight, 
+			new FlxColor(Std.parseInt(this.config.backgroundColor)), 
+			{ color : new FlxColor(Std.parseInt(this.config.borderColor)), thickness : this.config.answerBorderThickness }, { smoothing : true });
 	}
 
-	private function createText(x : Float, y : Float, size : Int) {
+	private function createText(x : Float, y : Float, size : Int, color : String) {
 		var text : FlxText = new FlxText(x, y, 0, '', size);
-		text.setFormat('assets/fonts/gladiaclm-bold-webfont.ttf', size, new FlxColor(0x41FF00));
+		text.setFormat('assets/fonts/gladiaclm-bold-webfont.ttf', size, new FlxColor(Std.parseInt(color)));
 		this.screen.add(text);
 		return text;
 	}

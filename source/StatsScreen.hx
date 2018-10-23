@@ -11,12 +11,10 @@ typedef Stats = {
 class StatsScreen extends Screen {
 
 	private var groupToStats : Map<TwinGroup, Stats>;
-	private var config : ConfigData;
 	private var groupToTexts : Map<TwinGroup, FlxText>;
 
 	public function new(screen : FlxSpriteGroup, config : ConfigData) {
-		super(screen);
-		this.config = config;
+		super(screen, config);
 
 		groupToStats = new Map<TwinGroup, Stats>();
 		groupToTexts = new Map<TwinGroup, FlxText>();
@@ -41,10 +39,10 @@ class StatsScreen extends Screen {
 		var currY : Int = this.config.statsFirstTextY;
 
 		for (group in Type.allEnums(TwinGroup)) {
-			var groupText : FlxText = createText(this.config.statsGroupTextX, currY, 42);
+			var groupText : FlxText = createText(this.config.statsGroupTextX, currY, this.config.statsGroupFontSize, this.config.statsGroupTextColor);
 			setText(groupText, getHeader(group));
 
-			var valueText : FlxText = createText(this.config.statsValueTextX, currY, 42);
+			var valueText : FlxText = createText(this.config.statsValueTextX, currY, this.config.statsValueFontSize, this.config.statsValueTextColor);
 			groupToTexts[group] = valueText;
 
 			currY += this.config.statsYDiff;
@@ -84,7 +82,15 @@ class StatsScreen extends Screen {
 	}
 
 	private function saveStatistics() {
-		// Save statistics to file
+		var ratios : Array<String> = new Array<String>();
+		var numbers : Array<String> = new Array<String>();
+
+		for (group in Type.allEnums(TwinGroup)) {
+			ratios.push(Std.string(groupToStats[group].averageRatio));
+			numbers.push(Std.string(groupToStats[group].gamesNum));
+		}
+
+		sys.io.File.saveContent('assets/data/stats.txt', ratios.join('|') + ',' + ratios.join('|'));
 	}
 
 	private function renderStatistics() {

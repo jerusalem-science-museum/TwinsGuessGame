@@ -1,4 +1,47 @@
 {
+	"screenWidth" : 1920,
+	"screenHeight" : 1080,
+
+	"answerPositions" : [
+		{"x": 640, "y" : 360},
+		{"x": 1280, "y": 360},
+		{"x": 640, "y": 720},
+		{"x": 1280, "y": 720}
+	],
+
+	"questionPosition": {"x": 960, "y" : 90},
+	"waitTextPosition": {"x": 960, "y" : 990},
+
+	"answerRectWidth" : 300,
+	"answerRectHeight" : 300,
+	"answerNumberHeight" : 50,
+
+	"backgroundColor" : "0xFF0070BB",
+	"waitBackgroundColor" : "0x33000000",
+	"borderColor" : "0xFF35d3da",
+	"questionTextColor" : "0xFFFFFF",
+	"answerBorderColor": "0xFF35d3da",
+	"answerTextColor" : "0xFFFFFF",
+	"waitTextColor": "0xFFFFFF",
+	"answerBackgroundColor": "0xFF107dac",
+	"answerSelectedBackgroundColor": "0xfff89c12",
+	"answerCorrectBackgroundColor": "0xff9cb806",
+	"answerWrongBackgroundColor": "0xf23c06",
+	"answerNumberTextColor" : "0xFFFFFF",
+	"statsGroupTextColor": "0xFFFFFF",
+	"statsValueTextColor" : "0xFFFFFF",
+	"statsHighestValueTextColor" : "0x41FF00",
+
+	"answerBorderThickness" : 10,
+	"screenBorderThickness" : 10,
+
+	"questionFontSize": 60,
+	"answerFontSize": 42,
+	"waitTextFontSize": 60,
+	"answerNumberFontSize": 50,
+	"statsGroupFontSize": 42,
+	"statsValueFontSize": 42,
+
 	"boyAnswerNumber": 1,
 
 	"identicalTwinAnswerNumber" : 1,
