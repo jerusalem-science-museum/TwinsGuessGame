@@ -2,6 +2,7 @@ package;
 
 import flixel.group.FlxSpriteGroup;
 import flixel.text.FlxText;
+import flixel.util.FlxColor;
 
 typedef Stats = {
 	gamesNum : Int,
@@ -16,6 +17,9 @@ class StatsScreen extends Screen {
 	public function new(screen : FlxSpriteGroup, config : ConfigData) {
 		super(screen, config);
 
+		var header : FlxText = createText(this.config.questionPosition.x, this.config.questionPosition.y, this.config.questionFontSize, this.config.questionTextColor);
+		setText(header, this.config.statsHeaderText);
+
 		groupToStats = new Map<TwinGroup, Stats>();
 		groupToTexts = new Map<TwinGroup, FlxText>();
 
@@ -26,10 +30,11 @@ class StatsScreen extends Screen {
 	}
 
 	public function updateStatistics(group : TwinGroup, ratio : Float) {
+		trace('UPDATING STATS, GROUP: ' + group +', RATIO: ' + ratio);
+		trace('OLD RATIO: ' + groupToStats[group].averageRatio + ', NUM: ' + groupToStats[group].gamesNum);
 		groupToStats[group].averageRatio = (groupToStats[group].averageRatio * groupToStats[group].gamesNum + ratio) / (groupToStats[group].gamesNum + 1);
 		groupToStats[group].gamesNum++;
-
-		// Update statistics
+		trace('NEW RATIO: ' + groupToStats[group].averageRatio + ', NUM: ' + groupToStats[group].gamesNum);
 
 		renderStatistics();
 		saveStatistics();
@@ -90,12 +95,21 @@ class StatsScreen extends Screen {
 			numbers.push(Std.string(groupToStats[group].gamesNum));
 		}
 
-		sys.io.File.saveContent('assets/data/stats.txt', ratios.join('|') + ',' + ratios.join('|'));
+		sys.io.File.saveContent('assets/data/stats.txt', ratios.join('|') + ',' + numbers.join('|'));
 	}
 
 	private function renderStatistics() {
+		var highest : Float = 0;
 		for (group in Type.allEnums(TwinGroup)) {
-			setText(groupToTexts[group], this.config.percentageSuffixText + ' ' + Std.string(groupToStats[group].averageRatio * 100) + '%');
+			if (groupToStats[group].averageRatio > highest) {
+				highest = groupToStats[group].averageRatio;
+			}
+		}
+
+		for (group in Type.allEnums(TwinGroup)) {
+			groupToTexts[group].setFormat('assets/fonts/' + this.config.font, this.config.statsValueFontSize, 
+				new FlxColor(Std.parseInt(groupToStats[group].averageRatio == highest ? this.config.statsHighestValueTextColor : this.config.statsValueTextColor)));
+			setText(groupToTexts[group], this.config.percentageSuffixText + ' ' + Std.string(Math.round(groupToStats[group].averageRatio * 100)) + '%');
 		}
 	}
 }

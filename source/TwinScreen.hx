@@ -19,13 +19,13 @@ class TwinScreen extends Screen {
 
 	private var questionText : FlxText;
 	private var textAnswers : Array<FlxText>;
-	private var imageAnswers : Array<FlxSprite>;
-	private var imageAnswersNumbers : Array<FlxText>;
+	private var textAnswersNumbers : Array<FlxText>;
 
 	private var twinIndex : Int;
 
 	private var waitOverlay : FlxSprite;
 	private var waitText : FlxText;
+	private var summaryText : FlxText;
 
 	private var selectedIndex : Null<Int>;
 	private var correctIndex : Null<Int>;
@@ -40,15 +40,33 @@ class TwinScreen extends Screen {
 		this.selectedIndex = null;
 		this.correctIndex = null;
 
+		this.textAnswersNumbers = new Array<FlxText>();
+		for (i in 0...this.config.answerPositions.length) {
+			var numberText : FlxText = createText(this.config.answerPositions[i].x, 
+				this.config.answerPositions[i].y - this.config.answerRectHeight / 2 - this.config.answerNumberHeight / 2, this.config.answerNumberFontSize, this.config.answerNumberTextColor);
+			setText(numberText, Std.string(i + 1));
+			this.textAnswersNumbers.push(numberText);
+			numberText.visible = false;
+		}
+
 		this.questionText = createText(this.config.questionPosition.x, this.config.questionPosition.y, this.config.questionFontSize, this.config.questionTextColor);
 
 		this.textAnswers = new Array<FlxText>();
 
 		for (i in 0...this.config.answerPositions.length) {
-			this.textAnswers.push(createText(this.config.answerPositions[i].x, this.config.answerPositions[i].y, this.config.answerFontSize, this.config.answerTextColor));
+			var text : FlxText = new FlxText(this.config.answerPositions[i].x, 
+				this.config.answerPositions[i].y, this.config.answerRectWidth, '', this.config.answerFontSize);
+			text.setFormat('assets/fonts/' + this.config.font, this.config.answerFontSize, new FlxColor(Std.parseInt(this.config.answerTextColor)));
+			text.alignment = CENTER;
+			this.screen.add(text);
+			this.textAnswers.push(text);
 		}
-		
-		this.imageAnswers = new Array<FlxSprite>();
+
+		this.summaryText = new FlxText(this.config.screenWidth / 2, this.config.screenHeight / 2,
+			this.config.screenWidth, '', this.config.summaryFontSize);
+		this.summaryText.setFormat('assets/fonts/' + this.config.font, this.config.summaryFontSize, new FlxColor(Std.parseInt(this.config.summaryTextColor)));
+		this.summaryText.alignment = CENTER;
+		this.screen.add(this.summaryText);
 
 		this.waitOverlay = new FlxSprite();
 		this.waitOverlay.makeGraphic(this.config.screenWidth, this.config.screenHeight, new FlxColor(Std.parseInt(this.config.waitBackgroundColor)));
@@ -61,40 +79,25 @@ class TwinScreen extends Screen {
 	}
 
 	public function presentTextQuestion(text : String, answers : Array<String>) {
+		this.summaryText.visible = false;
 		this.selectedIndex = null;
 		this.correctIndex = null;
 		this.currAnswers = answers.length;
 		drawBackground();
 		setWaitOverlayVisibility(false);
-		hide(this.imageAnswers);
 
 		setText(this.questionText, text);
 
-		for (i in 0...answers.length) {
-			setText(this.textAnswers[i], answers[i]);
+		for (i in 0...this.config.answerPositions.length) {
+			if (i < answers.length) {
+				setText(this.textAnswers[i], answers[i]);
+				this.textAnswers[i].visible = true;
+			} else {
+				this.textAnswers[i].visible = false;
+			}
 		}
 
 		show(this.textAnswers);
-
-		this.inputActive = true;
-	}
-
-	public function presentImageQuestion(text : String, images : Array<FlxSprite>) {
-		setWaitOverlayVisibility(false);
-		hide(this.textAnswers);
-
-		setText(this.questionText, text);
-
-		//TODO: Destroy properly
-		this.imageAnswers = [];
-		for (i in 0...images.length) {
-			images[i].x = this.config.answerPositions[i].x;
-			images[i].y = this.config.answerPositions[i].y;
-			this.imageAnswers.push(images[i]);
-			screen.add(images[i]);
-		}
-
-		show(this.imageAnswers);
 		this.questionText.visible = true;
 
 		this.inputActive = true;
@@ -102,8 +105,9 @@ class TwinScreen extends Screen {
 
 	public function presentWaitingScreen(text : String, clearLast : Bool) {
 		if (clearLast) {
-			hide(this.imageAnswers);
+			clearBackground();
 			hide(this.textAnswers);
+			hide(this.textAnswersNumbers);
 			this.questionText.visible = false;
 		}
 
@@ -112,9 +116,21 @@ class TwinScreen extends Screen {
 		setWaitOverlayVisibility(true);
 	}
 
-	public function presentTwinAnswer(index : Int, correctIndex : Int) {
+	public function presentSummary(ratio : Float) {
+		clearBackground();
+		hide(this.textAnswers);
+		hide(this.textAnswersNumbers);
+		this.questionText.visible = false;
+		setText(this.summaryText, (new EReg(this.config.summrayPercentageToken, 'g')).replace(this.config.summaryText, Std.string(Math.round(ratio * 100))));
+		this.summaryText.visible = true;
+	}
+
+	public function presentTwinAnswer(index : Int) {
 		this.inputActive = false;
-		this.correctIndex = correctIndex;
+		this.correctIndex = index;
+
+		setText(this.questionText, (this.correctIndex == this.selectedIndex) ? this.config.successText : this.config.failText);
+
 		setWaitOverlayVisibility(false);
 		drawBackground();
 	}
@@ -123,7 +139,9 @@ class TwinScreen extends Screen {
 		if (this.inputActive) {
 			for (i in 0...this.buttonKeys.length) {
 				if (FlxG.keys.checkStatus(this.buttonKeys[i], JUST_PRESSED)) {
-					this.handleSelection(i);
+					if (i < this.currAnswers) {
+						this.handleSelection(i);
+					}
 				}
 			}
 		}
@@ -135,16 +153,18 @@ class TwinScreen extends Screen {
 	}
 
 	private function drawBackground() {
+		hide(this.textAnswersNumbers);
 		clearBackground();
+
 		for (i in 0...this.currAnswers) {
 			var fillColor : FlxColor = (i == this.selectedIndex) ? new FlxColor(Std.parseInt(this.config.answerSelectedBackgroundColor)) : new FlxColor(Std.parseInt(this.config.answerBackgroundColor));
 
-			if (this.correctIndex != null && i == this.correctIndex) {
-				fillColor = new FlxColor(Std.parseInt(this.config.answerCorrectBackgroundColor));
-			}
-
 			if (this.correctIndex != null && i == this.selectedIndex && this.selectedIndex != this.correctIndex) {
 				fillColor = new FlxColor(Std.parseInt(this.config.answerWrongBackgroundColor));
+			}
+
+			if (this.correctIndex != null && i == this.correctIndex) {
+				fillColor = new FlxColor(Std.parseInt(this.config.answerCorrectBackgroundColor));
 			}
 
 			this.canvas.drawRect(this.config.answerPositions[i].x - this.config.answerRectWidth / 2, 
@@ -155,14 +175,13 @@ class TwinScreen extends Screen {
 				this.config.answerPositions[i].y - this.config.answerRectHeight / 2 - this.config.answerNumberHeight, 
 				this.config.answerRectWidth, this.config.answerNumberHeight, fillColor,
 				 { color : new FlxColor(Std.parseInt(this.config.answerBorderColor)), thickness : this.config.answerBorderThickness }, { smoothing : true });
-			var numberText : FlxText = createText(this.config.answerPositions[i].x, 
-				this.config.answerPositions[i].y - this.config.answerRectWidth / 2 - this.config.answerNumberHeight / 2, this.config.answerNumberFontSize, this.config.answerNumberTextColor);
-			setText(numberText, Std.string(i + 1));
+			this.textAnswersNumbers[i].visible = true;
 		}
 	}
 
 	private function handleSelection(index : Int) {
 		trace("SELECTED: " + index);
+		this.inputActive = false;
 		
 		this.selectedIndex = index;
 		this.drawBackground();

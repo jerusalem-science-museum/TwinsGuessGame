@@ -16,11 +16,11 @@ class SoundUtils {
 	}
 
 	public static function playMusic(name : String) {
-		if (FlxG.sound.music != null) {
-			FlxG.sound.music.stop();
-		}
-
 	    FlxG.sound.playMusic("assets/sounds/" + name + SoundUtils.getSuffix(), 1, true);
+	}
+
+	public static function stopMusic() {
+		FlxG.sound.music.stop();
 	}
 
 	private static function getSuffix() : String {

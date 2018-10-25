@@ -1,36 +1,39 @@
 {
+	"font": "gladiaclm-bold-webfont.ttf",
+
 	"screenWidth" : 1920,
 	"screenHeight" : 1080,
 
 	"answerPositions" : [
-		{"x": 640, "y" : 360},
-		{"x": 1280, "y": 360},
-		{"x": 640, "y": 720},
-		{"x": 1280, "y": 720}
+		{"x": 700, "y" : 370},
+		{"x": 1220, "y": 370},
+		{"x": 700, "y": 730},
+		{"x": 1220, "y": 730}
 	],
 
 	"questionPosition": {"x": 960, "y" : 90},
 	"waitTextPosition": {"x": 960, "y" : 990},
 
 	"answerRectWidth" : 300,
-	"answerRectHeight" : 300,
-	"answerNumberHeight" : 50,
+	"answerRectHeight" : 260,
+	"answerNumberHeight" : 60,
 
 	"backgroundColor" : "0xFF0070BB",
 	"waitBackgroundColor" : "0x33000000",
 	"borderColor" : "0xFF35d3da",
-	"questionTextColor" : "0xFFFFFF",
+	"questionTextColor" : "0xFFFFFFFF",
 	"answerBorderColor": "0xFF35d3da",
-	"answerTextColor" : "0xFFFFFF",
-	"waitTextColor": "0xFFFFFF",
+	"answerTextColor" : "0xFFFFFFFF",
+	"waitTextColor": "0xFFFFFFFF",
 	"answerBackgroundColor": "0xFF107dac",
 	"answerSelectedBackgroundColor": "0xfff89c12",
-	"answerCorrectBackgroundColor": "0xff9cb806",
-	"answerWrongBackgroundColor": "0xf23c06",
-	"answerNumberTextColor" : "0xFFFFFF",
-	"statsGroupTextColor": "0xFFFFFF",
-	"statsValueTextColor" : "0xFFFFFF",
+	"answerCorrectBackgroundColor": "0xff00cc33",
+	"answerWrongBackgroundColor": "0xfff23c06",
+	"answerNumberTextColor" : "0xFFFFFFFF",
+	"statsGroupTextColor": "0xFFFFFFFF",
+	"statsValueTextColor" : "0xFFFFFFFF",
 	"statsHighestValueTextColor" : "0x41FF00",
+	"summaryTextColor": "0xFFFFFFFF",
 
 	"answerBorderThickness" : 10,
 	"screenBorderThickness" : 10,
@@ -41,6 +44,7 @@
 	"answerNumberFontSize": 50,
 	"statsGroupFontSize": 42,
 	"statsValueFontSize": 42,
+	"summaryFontSize": 60,
 
 	"boyAnswerNumber": 1,
 
@@ -56,16 +60,24 @@
 	"brothersText": "םימואת םניאש םיחא",
 	"notBrothersText": "םיחא אל",
 
-	"statsGroupTextX" : 700,
-	"statsValueTextX" : 1200,
-	"statsFirstTextY" : 100,
-	"statsYDiff" : 120,
+	"statsHeaderText": "תואצות",
+
+	"statsGroupTextX" : 1220,
+	"statsValueTextX" : 700,
+	"statsFirstTextY" : 230,
+	"statsYDiff" : 115,
 
 	"percentageSuffixText": "החלצה",
 
 	"chooseWaitText": "...םואתה תריחבל ןתמה",
 	"guessWaitText": "...םואתה שוחינל ןתמה",
 	"identityWaitText": "...םואתה תבושתל הכחמ",
+
+	"successText" : "!דובכה לכ",
+	"failText" : "!האבה הלאשה תא וסנ ,ארונ אל",
+
+	"summaryText": "!םכתופתתשה לע הדות\n!{percentage}% אוה םכלש החלצהה זוחא\n",
+	"summrayPercentageToken": "{percentage}",
 
 	"identityQuestions": [
 		{
@@ -74,25 +86,60 @@
 		},
 		{
 			"questionText": "?םתא םימואת וליא",
-			"answerTexts": ["םיהז םימואת", "םיהז אל םימואת", "םימואת םניאש םיחא", "םיחא אל"]
+			"answerTexts": ["םיהז םימואת", "םימואת\nםיהז אל", "םניאש םיחא\nםימואת", "םיחא אל"]
 		}
 	],
 
 	"guessQuestions": [
 		{
-			"chooseText": "בוהא עבצ רחב",
-			"guessText": "...םואתה רחבש עבצה תא שחנ",
-			"answerImages": ["color1.png", "color2.png", "color3.png", "color4.png"]
+			"chooseText": "עבצ רחב",
+			"guessText": "םואתה רחבש עבצה תא שחנ",
+			"answerTexts": ["לוחכ", "קורי", "םודא", "בוהצ"]
 		},
 		{
-			"chooseText": "בוהא עבצ רחב",
-			"guessText": "...םואתה רחבש עבצה תא שחנ",
-			"answerImages": ["color1.png", "color2.png", "color3.png", "color4.png"]
+			"chooseText": "הדילג לש םעט רחב",
+			"guessText": "םואתה רחבש הדילגה םעט תא שחנ",
+			"answerTexts": ["וקוש", "לינו", "קוטסיפ", "תות"]
 		},
 		{
-			"chooseText": "בוהא עבצ רחב",
-			"guessText": "...םואתה רחבש עבצה תא שחנ",
-			"answerImages": ["color1.png", "color2.png", "color3.png", "color4.png"]
+			"chooseText": "הרובחת ילכ רחב",
+			"guessText": "םואתה רחבש הרובחתה ילכ תא שחנ",
+			"answerTexts": ["תבכר", "תינוכמ", "סוטמ", "הריס"]
+		},
+		{
+			"chooseText": "ירפ רחב",
+			"guessText": "םואתה רחבש ירפה תא שחנ",
+			"answerTexts": ["םיבנע", "םיתות", "חופת", "הננב"]
+		},
+		{
+			"chooseText": "הנשב הנוע רחב",
+			"guessText": "םואתה רחבש הנשה תנוע תא שחנ",
+			"answerTexts": ["ץיק", "ויתס", "ףרוח", "ביבא"]
+		},
+		{
+			"chooseText": "הניגנ ילכ רחב",
+			"guessText": "םואתה רחבש הניגנה ילכ תא שחנ",
+			"answerTexts": ["רתנספ", "הרטיג", "םיפות", "לילח"]
+		},
+		{
+			"chooseText": "םייח לעב רחב",
+			"guessText": "םואתה רחבש םייחה לעב תא שחנ",
+			"answerTexts": ["ףנרק", "ליפ", "םטופופיה", "הרבז"]
+		},
+		{
+			"chooseText": "תשבי רחב",
+			"guessText": "םואתה רחבש תשביה תא שחנ",
+			"answerTexts": ["היסא", "הפוריא", "הקירמא", "הקירפא"]
+		},
+		{
+			"chooseText": "חרפ רחב",
+			"guessText": "םואתה רחבש חרפה תא שחנ",
+			"answerTexts": ["תינלכ", "תפקר", "סוריא", "סיקרנ"]
+		},
+		{
+			"chooseText": "קרי רחב",
+			"guessText": "םואתה רחבש קריה תא שחנ",
+			"answerTexts": ["ןופפלמ", "הסח", "הינבגע", "רזג"]
 		}
 	]
 }

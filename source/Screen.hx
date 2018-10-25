@@ -33,7 +33,7 @@ class Screen {
 
 	private function createText(x : Float, y : Float, size : Int, color : String) {
 		var text : FlxText = new FlxText(x, y, 0, '', size);
-		text.setFormat('assets/fonts/gladiaclm-bold-webfont.ttf', size, new FlxColor(Std.parseInt(color)));
+		text.setFormat('assets/fonts/' + this.config.font, size, new FlxColor(Std.parseInt(color)));
 		this.screen.add(text);
 		return text;
 	}

@@ -8,10 +8,12 @@ typedef Position = {
 typedef GuessQuestion = {
 	chooseText : String,
 	guessText : String,
-	answerImages : Array<String>
+	answerTexts : Array<String>
 }
 
 typedef ConfigData = {
+	font : String,
+
 	screenWidth : Int,
 	screenHeight : Int,
 
@@ -38,6 +40,7 @@ typedef ConfigData = {
 	statsGroupTextColor : String,
 	statsValueTextColor : String,
 	statsHighestValueTextColor : String,
+	summaryTextColor : String,
 
 	answerBorderThickness : Int,
 	screenBorderThickness : Int,
@@ -48,6 +51,7 @@ typedef ConfigData = {
 	answerNumberFontSize : Int,
 	statsGroupFontSize : Int,
 	statsValueFontSize : Int,
+	summaryFontSize : Int,
 
 	boyAnswerNumber : Int,
 
@@ -63,6 +67,8 @@ typedef ConfigData = {
 	brothersText : String,
 	notBrothersText : String,
 
+	statsHeaderText : String,
+
 	statsGroupTextX : Int,
 	statsValueTextX : Int,
 	statsFirstTextY : Int,
@@ -73,6 +79,12 @@ typedef ConfigData = {
 	chooseWaitText : String,
 	guessWaitText : String,
 	identityWaitText : String,
+
+	successText : String,
+	failText : String,
+
+	summaryText : String,
+	summrayPercentageToken : String,
 
 	identityQuestions: Array<IdentityQuestion>,
 	guessQuestions: Array<GuessQuestion>

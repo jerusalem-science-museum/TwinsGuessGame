@@ -80,7 +80,7 @@ class PlayState extends FlxState
         add(secondTwinSpriteGroup);
         add(statsSpriteGroup);
 
-        var firstTwinScreen : TwinScreen = new TwinScreen(firstTwinSpriteGroup, this.config, 0, [FlxKey.ZERO, FlxKey.ONE, FlxKey.TWO, FlxKey.THREE], this);
+        var firstTwinScreen : TwinScreen = new TwinScreen(firstTwinSpriteGroup, this.config, 0, [FlxKey.ONE, FlxKey.TWO, FlxKey.THREE, FlxKey.FOUR], this);
         var secondTwinScreen : TwinScreen = new TwinScreen(secondTwinSpriteGroup, this.config, 1, [FlxKey.SIX, FlxKey.SEVEN, FlxKey.EIGHT, FlxKey.NINE], this);
         twinScreens = new Array<TwinScreen>();
         twinScreens.push(firstTwinScreen);
@@ -114,12 +114,16 @@ class PlayState extends FlxState
         currAnswers[index] = answer;
 
         if (answersMade == expectedAnswers) {
-            new FlxTimer().start(3, function(timer) { nextState(); }, 1);
+            new FlxTimer().start(this.state == WAIT_FOR_GUESS ? 4 : 3, function(timer) { nextState(); }, 1);
         } else {
             showWaitScreen(index);
         }
 
         SoundUtils.playSound(SoundUtils.ITEM_SELECTED_SOUND);
+
+        if (this.state == WAIT_FOR_CHOICE || this.state == WAIT_FOR_GUESS) {
+            SoundUtils.stopMusic();
+        }
     }
 
     public function nextState() {
@@ -130,6 +134,7 @@ class PlayState extends FlxState
             state = TWIN_TYPE_QUESTION;
             showIdentityQuestion();
         } else if (state == TWIN_TYPE_QUESTION) {
+            processTwinType();
             switchGuesser();
             state = WAIT_FOR_CHOICE;
             showNextGuessQuestion();
@@ -137,27 +142,43 @@ class PlayState extends FlxState
             state = WAIT_FOR_GUESS;
             showNextGuess();
             showGuessWaitingScreen();
+            SoundUtils.playMusic(SoundUtils.GUESS_MUSIC);
         } else if (state == WAIT_FOR_GUESS) {
             evaluateHit();
             state = WAIT_FOR_RESULT_OK;
+            new FlxTimer().start(5, function(timer) { nextState(); }, 1);
         } else if (state == WAIT_FOR_RESULT_OK) {
-            guessesMade++;
+            this.guessesMade++;
+            trace("GUESSES: " + this.guessesMade);
             if (guessesMade == this.config.guessQuestions.length) {
+                // TODO: Show summary screen for both twins
+                var ratio : Float = this.hits / this.guessesMade;
+                this.twinScreens[this.nextGuesserIndex].presentSummary(ratio);
+                this.twinScreens[this.nextChooserIndex].presentSummary(ratio);
                 state = WAIT_FOR_GAME_OK;
+                statsScreen.updateStatistics(this.twinGroup, this.hits / this.guessesMade);
+                new FlxTimer().start(5, function(timer) { nextState(); }, 1);
+            } else {
+                switchGuesser();
+                state = WAIT_FOR_CHOICE;
+                showNextGuessQuestion();
+                SoundUtils.playMusic(SoundUtils.CHOOSE_MUSIC);
             }
         } else if (state == WAIT_FOR_GAME_OK) {
-            statsScreen.updateStatistics(this.twinGroup, this.hits / this.guessesMade);
-            state = BOY_GIRL_QUESTION;
+            startGame();
         }
     }
 
     private function evaluateHit() {
         if (this.currAnswers[this.nextGuesserIndex] == this.currAnswers[this.nextChooserIndex]) {
+            SoundUtils.playSound(SoundUtils.CORRECT_ANSWER_SOUND);
             this.hits++;
+        } else {
+            SoundUtils.playSound(SoundUtils.WRONG_ANSWER_SOUND);
         }
 
-        this.twinScreens[this.nextGuesserIndex].presentTwinAnswer(this.currAnswers[this.nextChooserIndex], this.currAnswers[this.nextGuesserIndex]);
-        this.twinScreens[this.nextChooserIndex].presentTwinAnswer(this.currAnswers[this.nextGuesserIndex], this.currAnswers[this.nextChooserIndex]);
+        this.twinScreens[this.nextGuesserIndex].presentTwinAnswer(this.currAnswers[this.nextChooserIndex]);
+        this.twinScreens[this.nextChooserIndex].presentTwinAnswer(this.currAnswers[this.nextGuesserIndex]);
     }
 
     private function startGame() {
@@ -166,6 +187,7 @@ class PlayState extends FlxState
         this.nextGuesserIndex = 1;
         this.guessesMade = 0;
         this.currIdentityQuestion = 0;
+        
         state = BOY_GIRL_QUESTION;
         showIdentityQuestion();
         SoundUtils.playMusic(SoundUtils.CHOOSE_MUSIC);
@@ -210,7 +232,7 @@ class PlayState extends FlxState
     private function showNextChoice() {
         this.answersMade = 0;
         this.expectedAnswers = 1;
-        this.twinScreens[this.nextChooserIndex].presentImageQuestion(getGuessQuestion().chooseText, loadSprites(getGuessQuestion().answerImages));
+        this.twinScreens[this.nextChooserIndex].presentTextQuestion(getGuessQuestion().chooseText, getGuessQuestion().answerTexts);
     }
 
     private function showChoiceWaitingScreen() {
@@ -220,18 +242,7 @@ class PlayState extends FlxState
     private function showNextGuess() {
         this.answersMade = 0;
         this.expectedAnswers = 1;
-        this.twinScreens[this.nextGuesserIndex].presentImageQuestion(getGuessQuestion().guessText, loadSprites(getGuessQuestion().answerImages));
-    }
-
-    private function loadSprites(names : Array<String>) : Array<FlxSprite> {
-        var sprites : Array<FlxSprite> = new Array<FlxSprite>();
-        for (i in 0...names.length) {
-            var sprite : FlxSprite = new FlxSprite();
-            sprite.loadGraphic('assets/images/' + names[i]);
-            sprites.push(sprite);
-        }
-
-        return sprites;
+        this.twinScreens[this.nextGuesserIndex].presentTextQuestion(getGuessQuestion().guessText, getGuessQuestion().answerTexts);
     }
 
     private function showGuessWaitingScreen() {
@@ -239,8 +250,8 @@ class PlayState extends FlxState
     }  
 
     private function processBoyGirl() {
-        this.isFirstBoy = (this.currAnswers[0] == this.config.boyAnswerNumber);
-        this.isSecondBoy = (this.currAnswers[1] == this.config.boyAnswerNumber);
+        this.isFirstBoy = (this.currAnswers[0] == this.config.boyAnswerNumber - 1);
+        this.isSecondBoy = (this.currAnswers[1] == this.config.boyAnswerNumber - 1);
     }
 
     private function showWaitScreen(index : Int) {
@@ -250,13 +261,13 @@ class PlayState extends FlxState
     private function processTwinType() {
         this.twinType = currAnswers[0];
         
-        if (this.twinType == this.config.identicalTwinAnswerNumber) {
+        if (this.twinType == this.config.identicalTwinAnswerNumber - 1) {
             if (this.isFirstBoy) {
                 this.twinGroup = IDENTICAL_BOYS;
             } else {
                 this.twinGroup = IDENTICAL_GIRLS;
             }
-        } else if (this.twinType == this.config.nonIdenticalTwinsAnswerNumber) {
+        } else if (this.twinType == this.config.nonIdenticalTwinsAnswerNumber - 1) {
             if (this.isFirstBoy && this.isSecondBoy) {
                 this.twinGroup = NON_IDENTICAL_BOYS;
             } else if (!this.isFirstBoy && !this.isSecondBoy) {
@@ -264,10 +275,12 @@ class PlayState extends FlxState
             } else {
                 this.twinGroup = NON_IDENTICAL_BOY_GIRL;
             }
-        } else if (this.twinType == this.config.brothersAnswerNumber) {
+        } else if (this.twinType == this.config.brothersAnswerNumber - 1) {
             this.twinGroup = NON_TWIN_BROTHERS;
         } else {
             this.twinGroup = NOT_BROTHERS;
         }
+
+        trace('TWIN TYPE: ' + this.twinType + ', IS FIRST BOY: ' + this.isFirstBoy + ', IS SECOND BOY: ' + this.isSecondBoy + ', GROUP: ' + this.twinGroup);
     }
 }
