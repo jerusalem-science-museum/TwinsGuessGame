@@ -11,6 +11,6 @@ class Main extends Sprite
 	{
 		super();
 		FlxG.autoPause = false;
-		addChild(new FlxGame(0, 0, PlayState, 1, 60, 60, true, true));
+		addChild(new FlxGame(5760, 1080, PlayState, 1, 60, 60, true, false));
 	}
 }

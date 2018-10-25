@@ -67,7 +67,7 @@
 	"statsFirstTextY" : 230,
 	"statsYDiff" : 115,
 
-	"percentageSuffixText": "החלצה",
+	"percentageSuffixText": "{percentage}% החלצה",
 
 	"chooseWaitText": "...םואתה תריחבל ןתמה",
 	"guessWaitText": "...םואתה שוחינל ןתמה",

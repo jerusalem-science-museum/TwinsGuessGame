@@ -3,7 +3,6 @@ package;
 using Lambda;
 
 import haxe.Json;
-import sys.io.File;
 
 import flixel.FlxG;
 import flixel.FlxSprite;
@@ -39,6 +38,154 @@ enum State {
 
 class PlayState extends FlxState
 {
+    private static var CONFIG_FILE : String = '
+        {
+    "font": "gladiaclm-bold-webfont.ttf",
+
+    "screenWidth" : 1920,
+    "screenHeight" : 1080,
+
+    "answerPositions" : [
+        {"x": 700, "y" : 370},
+        {"x": 1220, "y": 370},
+        {"x": 700, "y": 730},
+        {"x": 1220, "y": 730}
+    ],
+
+    "questionPosition": {"x": 960, "y" : 90},
+    "waitTextPosition": {"x": 960, "y" : 930},
+
+    "answerRectWidth" : 300,
+    "answerRectHeight" : 260,
+    "answerNumberHeight" : 60,
+
+    "backgroundColor" : "0xFF0070BB",
+    "waitBackgroundColor" : "0x33000000",
+    "borderColor" : "0xFF35d3da",
+    "questionTextColor" : "0xFFFFFFFF",
+    "answerBorderColor": "0xFF35d3da",
+    "answerTextColor" : "0xFFFFFFFF",
+    "waitTextColor": "0xFFFFFFFF",
+    "answerBackgroundColor": "0xFF107dac",
+    "answerSelectedBackgroundColor": "0xfff89c12",
+    "answerCorrectBackgroundColor": "0xff00cc33",
+    "answerWrongBackgroundColor": "0xfff23c06",
+    "answerNumberTextColor" : "0xFFFFFFFF",
+    "statsGroupTextColor": "0xFFFFFFFF",
+    "statsValueTextColor" : "0xFFFFFFFF",
+    "statsHighestValueTextColor" : "0x41FF00",
+    "summaryTextColor": "0xFFFFFFFF",
+
+    "answerBorderThickness" : 10,
+    "screenBorderThickness" : 10,
+
+    "questionFontSize": 60,
+    "answerFontSize": 42,
+    "waitTextFontSize": 60,
+    "answerNumberFontSize": 50,
+    "statsGroupFontSize": 42,
+    "statsValueFontSize": 42,
+    "summaryFontSize": 60,
+
+    "boyAnswerNumber": 1,
+
+    "identicalTwinAnswerNumber" : 1,
+    "nonIdenticalTwinsAnswerNumber" : 2,
+    "brothersAnswerNumber" : 3,
+
+    "identicalBoysStatsText": "תאומים זהים בנים",
+    "identicalGirlsStatsText": "תאומות זהות בנות",
+    "nonIdenticalBoysStatsText": "תאומים לא זהים בנים",
+    "nonIdenticalGirlsStatsText": "תאומות לא זהות בנות",
+    "boyGirlStatsText": "תאומים לא זהים בן ובת",
+    "brothersText": "אחים שאינם תאומים",
+    "notBrothersText": "לא אחים",
+
+    "statsHeaderText": "אחוזי הצלחה",
+
+    "statsGroupTextX" : 1220,
+    "statsValueTextX" : 700,
+    "statsFirstTextY" : 230,
+    "statsYDiff" : 115,
+
+    "percentageSuffixText": "{percentage}%",
+
+    "chooseWaitText": "...מחכה לבחירת התאום",
+    "guessWaitText": "...מחכה לניחוש התאום",
+    "identityWaitText": "...מחכה לתשובת התאום",
+
+    "successText" : "!כל הכבוד",
+    "failText" : "!לא נורא, נסו את השאלה הבאה",
+
+    "summaryText": "!אחוז ההצלחה שלכם הוא {percentage}%\\n!תודה על השתתפותכם",
+    "summrayPercentageToken": "{percentage}",
+
+    "identityQuestions": [
+        {
+            "questionText": "?האם את/ה בן או בת",
+            "answerTexts": ["בן", "בת"]
+        },
+        {
+            "questionText": "?אילו תאומים אתם",
+            "answerTexts": ["תאומים זהים", "תאומים\\nלא זהים", "אחים שאינם\\nתאומים", "לא אחים"]
+        }
+    ],
+
+    "guessQuestions": [
+        {
+            "chooseText": "בחר/י צבע",
+            "guessText": "נחש/י את הצבע שבחר/ה התאומ/ה",
+            "answerTexts": ["כחול", "ירוק", "אדום", "צהוב"]
+        },
+        {
+            "chooseText": "בחר/י טעם של גלידה",
+            "guessText": "נחש/י את טעם הגלידה שבחר/ה התאומ/ה",
+            "answerTexts": ["שוקו", "וניל", "פיסטוק", "תות"]
+        },
+        {
+            "chooseText": "בחר/י כלי תחבורה",
+            "guessText": "נחש/י את כלי התחבורה שבחר/ה התאומ/ה",
+            "answerTexts": ["רכבת", "מכונית", "מטוס", "סירה"]
+        },
+        {
+            "chooseText": "בחר/י פרי",
+            "guessText": "נחש/י את הפרי שבחר/ה התאומ/ה",
+            "answerTexts": ["ענבים", "תותים", "תפוח", "בננה"]
+        },
+        {
+            "chooseText": "בחר/י עונה בשנה",
+            "guessText": "נחש/י את עונת השנה שבחר/ה התאומ/ה",
+            "answerTexts": ["קיץ", "סתיו", "חורף", "אביב"]
+        },
+        {
+            "chooseText": "בחר/י כלי נגינה",
+            "guessText": "נחש/י את כלי הנגינה שבחר/ה התאומ/ה",
+            "answerTexts": ["פסנתר", "גיטרה", "תופים", "חליל"]
+        },
+        {
+            "chooseText": "בחר/י בעל חיים",
+            "guessText": "נחש/י את בעל החיים שבחר/ה התאומ/ה",
+            "answerTexts": ["קרנף", "פיל", "היפופוטם", "זברה"]
+        },
+        {
+            "chooseText": "בחר/י יבשת",
+            "guessText": "נחש/י את היבשת שבחר/ה התאומ/ה",
+            "answerTexts": ["אסיה", "אירופה", "אמריקה", "אפריקה"]
+        },
+        {
+            "chooseText": "בחר/י פרח",
+            "guessText": "נחש/י את הפרח שבחר/ה התאומ/ה",
+            "answerTexts": ["כלנית", "רקפת", "אירוס", "נרקיס"]
+        },
+        {
+            "chooseText": "בחר/י ירק",
+            "guessText": "נחש/י את הירק שבחר/ה התאומ/ה",
+            "answerTexts": ["מלפפון", "חסה", "עגבניה", "גזר"]
+        }
+    ]
+}
+    ';
+
     private static inline var NO_ANSWER : Int = -1;
 
     private var config : ConfigData;
@@ -63,14 +210,19 @@ class PlayState extends FlxState
 
     private var twinGroup : TwinGroup;
 
+    private var currTimerLeft : Float;
+
     override public function create() : Void {
         super.create();
+        initGame();
+    }
 
+    private function initGame() : Void {
         currAnswers = new Array<Int>();
         currAnswers.push(NO_ANSWER);
         currAnswers.push(NO_ANSWER);
 
-        this.config = Json.parse(File.getContent("assets/data/config.json"));
+        this.config = Json.parse(/*File.getContent("assets/data/config.json")*/CONFIG_FILE);
 
         var firstTwinSpriteGroup : FlxSpriteGroup = new FlxSpriteGroup(0, 0);
         var secondTwinSpriteGroup : FlxSpriteGroup = new FlxSpriteGroup(1920, 0);
@@ -100,13 +252,49 @@ class PlayState extends FlxState
     override public function update(elapsed : Float) : Void {
         super.update(elapsed);
 
-        for (screen in this.twinScreens) {
-            screen.update();
+        if (this.currTimerLeft != -1) {
+            this.currTimerLeft -= elapsed * 10;
+            if (this.currTimerLeft <= 0) {
+                this.currTimerLeft = -1;
+                nextState();
+            }
         }
 
-        if (FlxG.keys.enabled && FlxG.keys.pressed.ESCAPE) {
-            System.exit(0);
+        if (FlxG.keys.justPressed.ONE) {
+            this.twinScreens[0].selectionPressed(0);
         }
+
+        if (FlxG.keys.justPressed.TWO) {
+            this.twinScreens[0].selectionPressed(1);
+        }
+
+        if (FlxG.keys.justPressed.THREE) {
+            this.twinScreens[0].selectionPressed(2);
+        }
+
+        if (FlxG.keys.justPressed.FOUR) {
+            this.twinScreens[0].selectionPressed(3);
+        }
+
+        if (FlxG.keys.justPressed.SIX) {
+            this.twinScreens[1].selectionPressed(0);
+        }
+
+        if (FlxG.keys.justPressed.SEVEN) {
+            this.twinScreens[1].selectionPressed(1);
+        }
+
+        if (FlxG.keys.justPressed.EIGHT) {
+            this.twinScreens[1].selectionPressed(2);
+        }
+
+        if (FlxG.keys.justPressed.NINE) {
+            this.twinScreens[1].selectionPressed(3);
+        }
+
+        /*for (screen in this.twinScreens) {
+            screen.update();
+        }*/
     }
 
     public function onSelection(index : Int, answer : Int) {
@@ -114,7 +302,7 @@ class PlayState extends FlxState
         currAnswers[index] = answer;
 
         if (answersMade == expectedAnswers) {
-            new FlxTimer().start(this.state == WAIT_FOR_GUESS ? 4 : 3, function(timer) { nextState(); }, 1);
+            this.currTimerLeft = this.state == WAIT_FOR_GUESS ? 4 : 3;
         } else {
             showWaitScreen(index);
         }
@@ -127,8 +315,6 @@ class PlayState extends FlxState
     }
 
     public function nextState() {
-        trace("NEXT STATE CALLED");
-
         if (state == BOY_GIRL_QUESTION) {
             processBoyGirl();
             state = TWIN_TYPE_QUESTION;
@@ -146,10 +332,9 @@ class PlayState extends FlxState
         } else if (state == WAIT_FOR_GUESS) {
             evaluateHit();
             state = WAIT_FOR_RESULT_OK;
-            new FlxTimer().start(5, function(timer) { nextState(); }, 1);
+            this.currTimerLeft = 3;
         } else if (state == WAIT_FOR_RESULT_OK) {
             this.guessesMade++;
-            trace("GUESSES: " + this.guessesMade);
             if (guessesMade == this.config.guessQuestions.length) {
                 // TODO: Show summary screen for both twins
                 var ratio : Float = this.hits / this.guessesMade;
@@ -157,7 +342,7 @@ class PlayState extends FlxState
                 this.twinScreens[this.nextChooserIndex].presentSummary(ratio);
                 state = WAIT_FOR_GAME_OK;
                 statsScreen.updateStatistics(this.twinGroup, this.hits / this.guessesMade);
-                new FlxTimer().start(5, function(timer) { nextState(); }, 1);
+                this.currTimerLeft = 5;
             } else {
                 switchGuesser();
                 state = WAIT_FOR_CHOICE;
@@ -182,6 +367,7 @@ class PlayState extends FlxState
     }
 
     private function startGame() {
+        this.currTimerLeft = -1;
         this.hits = 0;
         this.nextChooserIndex = 0;
         this.nextGuesserIndex = 1;
