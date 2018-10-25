@@ -97,7 +97,6 @@ class TwinScreen extends Screen {
 			}
 		}
 
-		show(this.textAnswers);
 		this.questionText.visible = true;
 
 		this.inputActive = true;
@@ -147,6 +146,14 @@ class TwinScreen extends Screen {
 		}
 	}
 
+	public function selectionPressed(i : Int) {
+		if (this.inputActive) {
+			if (i < this.currAnswers) {
+				this.handleSelection(i);
+			}
+		}
+	}
+
 	private function setWaitOverlayVisibility(visible : Bool) {
 		waitOverlay.visible = visible;
 		waitText.visible = visible;
@@ -180,7 +187,6 @@ class TwinScreen extends Screen {
 	}
 
 	private function handleSelection(index : Int) {
-		trace("SELECTED: " + index);
 		this.inputActive = false;
 		
 		this.selectedIndex = index;

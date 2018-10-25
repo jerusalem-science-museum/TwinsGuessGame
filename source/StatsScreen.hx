@@ -3,6 +3,7 @@ package;
 import flixel.group.FlxSpriteGroup;
 import flixel.text.FlxText;
 import flixel.util.FlxColor;
+import js.Cookie;
 
 typedef Stats = {
 	gamesNum : Int,
@@ -10,6 +11,9 @@ typedef Stats = {
 }
 
 class StatsScreen extends Screen {
+
+	private static var COOKIE_NAME : String = "TwinsGuessingGameStats";
+	private static var START_VALUE : String = "0.0|0.0|0.0|0.0|0.0|0.0|0.0,0|0|0|0|0|0|0";
 
 	private var groupToStats : Map<TwinGroup, Stats>;
 	private var groupToTexts : Map<TwinGroup, FlxText>;
@@ -74,7 +78,11 @@ class StatsScreen extends Screen {
 
 
 	private function loadStatistics() {
-		var content : String = sys.io.File.getContent('assets/data/stats.txt');
+		if (Cookie.get(COOKIE_NAME) == null) {
+			Cookie.set(COOKIE_NAME, START_VALUE);
+		}
+
+		var content : String = Cookie.get(COOKIE_NAME);
 		var ratios : Array<String> = content.split(',')[0].split('|');
 		var numbers : Array<String> = content.split(',')[1].split('|');
 
@@ -95,7 +103,7 @@ class StatsScreen extends Screen {
 			numbers.push(Std.string(groupToStats[group].gamesNum));
 		}
 
-		sys.io.File.saveContent('assets/data/stats.txt', ratios.join('|') + ',' + numbers.join('|'));
+		Cookie.set(COOKIE_NAME, ratios.join('|') + ',' + numbers.join('|'));
 	}
 
 	private function renderStatistics() {
@@ -109,7 +117,8 @@ class StatsScreen extends Screen {
 		for (group in Type.allEnums(TwinGroup)) {
 			groupToTexts[group].setFormat('assets/fonts/' + this.config.font, this.config.statsValueFontSize, 
 				new FlxColor(Std.parseInt(groupToStats[group].averageRatio == highest ? this.config.statsHighestValueTextColor : this.config.statsValueTextColor)));
-			setText(groupToTexts[group], this.config.percentageSuffixText + ' ' + Std.string(Math.round(groupToStats[group].averageRatio * 100)) + '%');
+			var percentage : String = Std.string(Math.round(groupToStats[group].averageRatio * 100));
+			setText(groupToTexts[group], (new EReg(this.config.summrayPercentageToken, 'g')).replace(this.config.percentageSuffixText, percentage));
 		}
 	}
 }

@@ -12,11 +12,13 @@ class SoundUtils {
 	public static var GUESS_MUSIC : String = "guess-music";
 
 	public static function playSound(name : String, volume : Float = 1, shouldLoop : Bool = false, ?onComplete : Void -> Void) : FlxSound {
-        return FlxG.sound.play("assets/sounds/" + name + SoundUtils.getSuffix(), volume, shouldLoop, null, true, onComplete);
+        return FlxG.sound.play("assets/sounds/" + name + getSuffix(), volume, shouldLoop, null, true, onComplete);
+        //return null;
 	}
 
+
 	public static function playMusic(name : String) {
-	    FlxG.sound.playMusic("assets/sounds/" + name + SoundUtils.getSuffix(), 1, true);
+	    FlxG.sound.playMusic("assets/sounds/" + name + getSuffix(), 1, true);
 	}
 
 	public static function stopMusic() {
